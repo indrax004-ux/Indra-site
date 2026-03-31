@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GC Wasio – Rules 💜</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --pink: #f472b6;
+      --purple: #a855f7;
+      --deep: #7c3aed;
+      --glass-bg: rgba(255,255,255,0.09);
+      --glass-border: rgba(255,255,255,0.22);
+      --card-bg: rgba(255,255,255,0.07);
+      --card-border: rgba(255,255,255,0.18);
+      --text: #fff;
+      --text-muted: rgba(255,255,255,0.72);
+      --glow-pink: 0 0 24px rgba(244,114,182,0.55);
+      --glow-purple: 0 0 24px rgba(168,85,247,0.55);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1a0533 0%, #3b0764 25%, #6b21a8 50%, #be185d 80%, #db2777 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── PARTICLE CANVAS ── */
+    #particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+
+    /* ── MUSIC BTN ── */
+    #musicBtn {
+      position: fixed;
+      top: 18px; right: 18px;
+      z-index: 999;
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      border: 1.5px solid var(--glass-border);
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      transition: transform .25s, box-shadow .25s;
+    }
+    #musicBtn:hover { transform: scale(1.12); box-shadow: var(--glow-pink); }
+
+    /* ── PAGE WRAPPER ── */
+    .page {
+      position: relative; z-index: 1;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 60px 20px 40px;
+      opacity: 0;
+      transform: translateY(28px);
+      animation: fadeUp .9s cubic-bezier(.22,1,.36,1) .15s forwards;
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: none; }
+    }
+
+    /* ── GLASS CONTAINER ── */
+    .glass-container {
+      background: var(--glass-bg);
+      border: 1.5px solid var(--glass-border);
+      border-radius: 28px;
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      box-shadow: 0 8px 60px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.12);
+      padding: 44px 36px 36px;
+    }
+
+    /* ── HEADER ── */
+    header { text-align: center; margin-bottom: 40px; }
+
+    .crown { font-size: 2.2rem; display: block; margin-bottom: 6px; animation: float 3s ease-in-out infinite; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.9rem, 6vw, 2.9rem);
+      font-weight: 900;
+      background: linear-gradient(90deg, #f9a8d4, #e879f9, #a78bfa, #f9a8d4);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 4s linear infinite;
+      line-height: 1.2;
+    }
+    @keyframes shimmer { to { background-position: 200% center; } }
+
+    .subtitle {
+      margin-top: 10px;
+      font-size: .9rem;
+      color: var(--text-muted);
+      letter-spacing: .04em;
+      font-weight: 300;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1.5px;
+      background: linear-gradient(90deg, transparent, var(--pink), var(--purple), transparent);
+      border-radius: 99px;
+      margin: 32px 0;
+      opacity: .7;
+    }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #e879f9;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    /* ── RULES GRID ── */
+    .rules-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    /* ── RULE CARD ── */
+    .rule-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--card-border);
+      border-radius: 18px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      cursor: default;
+      transition: transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s, border-color .3s;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .rule-card.visible {
+      animation: cardIn .5s cubic-bezier(.22,1,.36,1) forwards;
+    }
+
+    @keyframes cardIn {
+      to { opacity: 1; transform: none; }
+    }
+
+    .rule-card:hover {
+      transform: translateY(-4px) scale(1.025);
+      box-shadow: var(--glow-pink), 0 12px 40px rgba(0,0,0,0.25);
+      border-color: rgba(244,114,182,0.55);
+    }
+
+    .rule-number {
+      min-width: 38px; height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .78rem;
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+      box-shadow: 0 4px 14px rgba(168,85,247,0.4);
+      flex-shrink: 0;
+    }
+
+    .rule-text { flex: 1; }
+
+    .rule-title {
+      font-weight: 600;
+      font-size: .97rem;
+      margin-bottom: 4px;
+      color: #f5d0fe;
+    }
+
+    .rule-desc {
+      font-size: .83rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      font-weight: 300;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      margin-top: 36px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .footer-note {
+      font-size: .82rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .insta-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 600;
+      font-size: .95rem;
+      padding: 10px 22px;
+      border-radius: 50px;
+      border: 1.5px solid var(--glass-border);
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+      transition: all .3s;
+      letter-spacing: .03em;
+    }
+
+    .insta-link:hover {
+      background: linear-gradient(90deg, rgba(244,114,182,0.25), rgba(168,85,247,0.25));
+      border-color: var(--pink);
+      box-shadow: var(--glow-pink);
+      transform: scale(1.04);
+    }
+
+    .insta-icon { font-size: 1.1rem; }
+
+    .copyright {
+      margin-top: 18px;
+      font-size: .72rem;
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(244,114,182,0.4); border-radius: 99px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 520px) {
+      .glass-container { padding: 28px 18px 24px; }
+      .rule-card { padding: 14px 14px; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="particles"></canvas>
+
+  <button id="musicBtn" title="Play / Pause music" aria-label="Play or pause background music">🎵</button>
+  <audio id="bgMusic" loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg" />
+  </audio>
+
+  <div class="page">
+    <div class="glass-container">
+
+      <header>
+        <span class="crown">💜</span>
+        <h1>Welcome GC Wasio 💜</h1>
+        <p class="subtitle">A safe, cute &amp; positive space for everyone ✨</p>
+      </header>
+
+      <div class="divider"></div>
+      <p class="section-title">📋 Group Chat Rules</p>
+
+      <div class="rules-grid" id="rulesGrid">
+
+        <div class="rule-card">
+          <div class="rule-number">01</div>
+          <div class="rule-text">
+            <div class="rule-title">🤝 Respect Everyone</div>
+            <div class="rule-desc">Koi gali, insult ya personal attack nahi. Sab ko izzat do.</div>
+          </div>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-number">02</div>
+          <div class="rule-text">
+            <div class="rule-title">☮️ No Fights / Drama</div>
+            <div class="rule-desc">Agar koi problem ho toh admin se baat karo — GC mein drama allowed nahi.</div>
+          </div>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-number">03</div>
+          <div class="rule-text">
+            <div class="rule-title">🚫 No Spam</div>
+            <div class="rule-desc">Baar-baar same messages ya links mat bhejo. Stickers allowed hain, but harmful nahi.</div>
+          </div>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-number">04</div>
+          <div class="rule-text">
+            <div class="rule-title">🔞 No 18+ Content</div>
+            <div class="rule-desc">Koi adult ya inappropriate cheez allowed nahi — bilkul nahi.</div>
+          </div>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-number">05</div>
+          <div class="rule-text">
+            <div class="rule-title">📰 No Fake News</div>
+            <div class="rule-desc">Galat information share mat karo. Verify karo pehle, phir daalo.</div>
+          </div>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-number">06</div>
+          <div class="rule-text">
+            <div class="rule-title">💬 Stay Active</div>
+            <div class="rule-desc">Sirf read karke mat baitho — kabhi-kabhi chat bhi karo, vibe banao!</div>
+          </div>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-number">07</div>
+          <div class="rule-text">
+            <div class="rule-title">🔒 No Personal Info Sharing</div>
+            <div class="rule-desc">Kisi ka number, address ya private chat ka screenshot bina permission ke mat daalo.</div>
+          </div>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-number">08</div>
+          <div class="rule-text">
+            <div class="rule-title">👑 Admin is Final</div>
+            <div class="rule-desc">Admin ke decision ka full respect karo — unka word final hai.</div>
+          </div>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-number">09</div>
+          <div class="rule-text">
+            <div class="rule-title">📢 No Promotion</div>
+            <div class="rule-desc">Apna channel, page ya business ka promotion bina permission ke nahi.</div>
+          </div>
+        </div>
+
+        <div class="rule-card">
+          <div class="rule-number">10</div>
+          <div class="rule-text">
+            <div class="rule-title">🎉 Have Fun!</div>
+            <div class="rule-desc">Positive vibe rakho aur enjoy karo — yahi toh GC ka maqsad hai! 💜</div>
+          </div>
+        </div>
+
+      </div>
+
+      <footer>
+        <p class="footer-note">Made with 💜 by the Admin</p>
+        <a class="insta-link" href="https://www.instagram.com/bluex004" target="_blank" rel="noopener">
+          <span class="insta-icon">📸</span> @bluex004
+        </a>
+        <p class="copyright">© 2025 GC Wasio · All rights reserved</p>
+      </footer>
+
+    </div>
+  </div>
+
+  <script>
+    /* ── FLOATING PARTICLES ── */
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    const hearts = ['💜','🩷','✨','💫','🌸','⭐'];
+    let W, H, particles = [];
+
+    function resize() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    function createParticle() {
+      return {
+        x: Math.random() * W,
+        y: H + 20,
+        emoji: hearts[Math.floor(Math.random() * hearts.length)],
+        size: 14 + Math.random() * 18,
+        speedY: 0.45 + Math.random() * 0.9,
+        speedX: (Math.random() - 0.5) * 0.5,
+        opacity: 0.15 + Math.random() * 0.4,
+        sway: Math.random() * Math.PI * 2,
+        swaySpeed: 0.008 + Math.random() * 0.012,
+      };
+    }
+
+    for (let i = 0; i < 30; i++) {
+      const p = createParticle();
+      p.y = Math.random() * H;
+      particles.push(p);
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, W, H);
+      particles.forEach((p, i) => {
+        p.sway += p.swaySpeed;
+        p.x += Math.sin(p.sway) * 0.5 + p.speedX;
+        p.y -= p.speedY;
+        ctx.globalAlpha = p.opacity;
+        ctx.font = `${p.size}px serif`;
+        ctx.fillText(p.emoji, p.x, p.y);
+        if (p.y < -30) particles[i] = createParticle();
+      });
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    /* ── CARD STAGGER (IntersectionObserver) ── */
+    const cards = document.querySelectorAll('.rule-card');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const i = [...cards].indexOf(entry.target);
+          entry.target.style.animationDelay = `${i * 0.07}s`;
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    cards.forEach(c => observer.observe(c));
+
+    /* ── MUSIC TOGGLE ── */
+    const musicBtn = document.getElementById('musicBtn');
+    const bgMusic  = document.getElementById('bgMusic');
+    let playing = false;
+
+    musicBtn.addEventListener('click', () => {
+      if (playing) {
+        bgMusic.pause();
+        musicBtn.textContent = '🎵';
+      } else {
+        bgMusic.play().catch(() => {});
+        musicBtn.textContent = '🔇';
+      }
+      playing = !playing;
+    });
+  </script>
+</body>
+</html>
